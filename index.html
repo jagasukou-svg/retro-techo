@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#efe2c4">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="レトロ手帖">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icon-180.png">
+  <link rel="icon" href="./icon-180.png">
+  <title>レトロ手帖</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #3c2a22;
+      --muted: #8a715c;
+      --card: #fbf6ea;
+      --paper: #efe2c4;
+      --brick: #b23a2f;
+      --navy: #2f4a62;
+      --olive: #5f6b3d;
+      --mustard: #c4923a;
+      --rule: #cbb892;
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      font-family: "Zen Maru Gothic", "Yu Gothic", sans-serif;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(178, 58, 47, 0.08), transparent 28%),
+        radial-gradient(circle at 90% 80%, rgba(47, 74, 98, 0.08), transparent 26%),
+        repeating-linear-gradient(0deg, transparent, transparent 11px, rgba(60, 42, 34, 0.035) 12px);
+    }
+
+    .install-hint {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--ink);
+      background: var(--card);
+      color: var(--ink);
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .install-hint[hidden] { display: none; }
+
+    .install-hint p { margin: 0; }
+
+    .install-hint button {
+      flex: 0 0 auto;
+      min-height: 44px;
+      padding: 8px 10px;
+      border: 1px solid var(--brick);
+      background: var(--brick);
+      color: #fbf6ea;
+      font-weight: 700;
+    }
+
+    .wrap {
+      width: min(480px, 100%);
+      margin: 0 auto;
+      padding:
+        max(16px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(28px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
+    }
+
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      min-width: 0;
+      font-family: "Shippori Mincho", serif;
+      font-size: clamp(1.45rem, 7vw, 1.85rem);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1.1;
+    }
+
+    h1 span {
+      display: block;
+      margin-top: 6px;
+      font-family: "Zen Maru Gothic", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--brick);
+    }
+
+    .count {
+      flex: 0 0 auto;
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      padding: 6px;
+      border: 2px solid var(--brick);
+      border-radius: 50%;
+      background: transparent;
+      text-align: center;
+      transform: rotate(-8deg);
+    }
+
+    .count strong {
+      display: block;
+      font-family: "Shippori Mincho", serif;
+      font-size: 1.4rem;
+      line-height: 1;
+      color: var(--brick);
+    }
+
+    .count small {
+      color: var(--brick);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 2px;
+      padding: 12px 8px 14px;
+      border: 1px solid var(--ink);
+      outline: 1px solid var(--ink);
+      outline-offset: 3px;
+      box-shadow: 4px 4px 0 rgba(60, 42, 34, 0.12);
+    }
+
+    .nav {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .nav h2 {
+      margin: 0;
+      min-width: 0;
+      text-align: center;
+      font-family: "Shippori Mincho", serif;
+      font-size: clamp(1.05rem, 4.6vw, 1.4rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.25;
+    }
+
+    button {
+      font: inherit;
+      cursor: pointer;
+      border: 0;
+      color: inherit;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .icon-btn,
+    .today-btn,
+    .day {
+      background: transparent;
+      border: 1px solid var(--rule);
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 2px;
+      font-family: "Shippori Mincho", serif;
+      font-size: 1.5rem;
+      color: var(--ink);
+      background: #f7f0de;
+    }
+
+    .icon-btn:active,
+    .today-btn:active,
+    .day:active {
+      transform: translate(1px, 1px);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .today-btn {
+      border-radius: 2px;
+      min-height: 44px;
+      padding: 10px 16px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #fbf6ea;
+      background: var(--brick);
+      border-color: var(--brick);
+    }
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      color: var(--brick);
+      font-weight: 700;
+      letter-spacing: 0.12em;
+    }
+
+    .bath {
+      width: 1.35rem;
+      height: 1.35rem;
+      display: block;
+    }
+
+    .weekdays,
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+
+    .weekdays {
+      margin-bottom: 6px;
+    }
+
+    .weekdays span {
+      text-align: center;
+      font-family: "Shippori Mincho", serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .weekdays span:first-child { color: var(--brick); }
+    .weekdays span:last-child { color: var(--navy); }
+
+    .day {
+      aspect-ratio: 1;
+      border-radius: 2px;
+      position: relative;
+      padding: 0;
+      font-family: "Shippori Mincho", serif;
+      font-weight: 700;
+      font-size: clamp(0.85rem, 3.6vw, 1rem);
+      background: #f7f0de;
+      user-select: none;
+    }
+
+    .day.sun { color: var(--brick); }
+    .day.sat { color: var(--navy); }
+    .day.in-week {
+      background: #f4ecda;
+    }
+
+    .day.today {
+      background: #f3e2b0;
+      border-color: var(--mustard);
+      box-shadow: inset 0 0 0 1px var(--mustard);
+    }
+
+    .day.marked {
+      background: #f8efe0;
+    }
+
+    .day.picked {
+      outline: 1px solid var(--ink);
+      outline-offset: -3px;
+    }
+
+    .day .todo-dot {
+      position: absolute;
+      left: 6px;
+      bottom: 5px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--olive);
+    }
+
+    .day .num {
+      position: absolute;
+      top: 5px;
+      left: 6px;
+      line-height: 1;
+    }
+
+    .day .mark {
+      position: absolute;
+      right: 1px;
+      bottom: 1px;
+      width: clamp(0.85rem, 3.4vw, 1.15rem);
+      height: clamp(0.85rem, 3.4vw, 1.15rem);
+      color: var(--brick);
+      transform: rotate(-8deg);
+    }
+
+    .day .mark svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .day .mark.pop {
+      animation: ink 0.22s ease-out;
+    }
+
+    .hint {
+      margin: 14px 4px 18px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .todos {
+      margin-top: 8px;
+    }
+
+    .picks {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+
+    .pick {
+      min-height: 52px;
+      padding: 6px 0 4px;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      background: #f7f0de;
+      line-height: 1.15;
+    }
+
+    .pick .w {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .pick .n {
+      font-family: "Shippori Mincho", serif;
+      font-size: 0.95rem;
+    }
+
+    .pick .open {
+      display: block;
+      min-height: 0.7rem;
+      font-size: 0.62rem;
+      color: var(--olive);
+    }
+
+    .pick.sun .w,
+    .pick.sun .n { color: var(--brick); }
+    .pick.sat .w,
+    .pick.sat .n { color: var(--navy); }
+
+    .pick[aria-selected="true"] {
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .pick[aria-selected="true"] .w,
+    .pick[aria-selected="true"] .n,
+    .pick[aria-selected="true"] .open {
+      color: #fbf6ea;
+    }
+
+    .composer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin: 12px 0 4px;
+    }
+
+    .composer input {
+      width: 100%;
+      min-width: 0;
+      min-height: 48px;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      background: #f7f0de;
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+      padding: 12px;
+    }
+
+    .add-btn {
+      min-height: 48px;
+      min-width: 76px;
+      border: 1px solid var(--olive);
+      border-radius: 2px;
+      background: var(--olive);
+      color: #fbf6ea;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 0 12px;
+    }
+
+    .left {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .tasks {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .task {
+      display: grid;
+      grid-template-columns: 44px 1fr 44px;
+      gap: 6px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--rule);
+    }
+
+    .task .text {
+      margin: 0;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .task.done .text {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .check,
+    .remove {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      background: #f7f0de;
+      font-size: 1.15rem;
+    }
+
+    .check[aria-pressed="true"] {
+      background: var(--olive);
+      border-color: var(--olive);
+      color: #fbf6ea;
+    }
+
+    .remove {
+      color: var(--muted);
+    }
+
+    .empty {
+      margin: 0;
+      padding: 16px 0 4px;
+      color: var(--muted);
+      list-style: none;
+    }
+
+    .sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .pick:active,
+    .add-btn:active,
+    .check:active,
+    .remove:active {
+      transform: translate(1px, 1px);
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--olive);
+      outline-offset: 2px;
+    }
+
+    @keyframes ink {
+      0% { transform: scale(1.45) rotate(-16deg); opacity: 0.15; }
+      100% { transform: scale(1) rotate(-8deg); opacity: 1; }
+    }
+
+    @media (max-width: 360px) {
+      .wrap { padding-inline: 8px; }
+      .card { padding-inline: 6px; outline-offset: 2px; }
+      .weekdays, .grid, .picks { gap: 2px; }
+      .count { width: 64px; height: 64px; }
+      .count strong { font-size: 1.2rem; }
+      .day .num { left: 4px; top: 4px; }
+      .day .todo-dot { left: 4px; bottom: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div id="install-hint" class="install-hint" hidden>
+      <p>共有ボタンから「ホーム画面に追加」すると、パソコンを切ってもこのスマホだけで開けるよ。</p>
+      <button id="install-dismiss" type="button">わかった</button>
+    </div>
+    <header>
+      <h1>レトロ手帖<span>朱印と週の用事</span></h1>
+      <div class="count" aria-live="polite">
+        <strong id="count">0</strong>
+        <small>この月の印</small>
+      </div>
+    </header>
+
+    <section class="card" aria-label="月間カレンダー">
+      <div class="nav">
+        <button class="icon-btn" id="prev" type="button" aria-label="前の月">‹</button>
+        <h2 id="title"></h2>
+        <button class="icon-btn" id="next" type="button" aria-label="次の月">›</button>
+      </div>
+
+      <div class="toolbar">
+        <button class="today-btn" id="today" type="button">きょう</button>
+        <p class="legend">
+          <svg class="bath" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3.5 12.5h17M6 12.5v4a6 6 0 0 0 12 0v-4M8 21.5v1.8M16 21.5v1.8M8 15.2q2-1.4 4 0t4 0M8.2 8.4c.7-.9.7-1.5 0-2.4M12 7.6c.7-.9.7-1.5 0-2.4M15.8 8.4c.7-.9.7-1.5 0-2.4"/>
+          </svg>
+          お風呂
+        </p>
+      </div>
+
+      <div class="weekdays" aria-hidden="true">
+        <span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span>
+      </div>
+      <div class="grid" id="grid" role="grid" aria-label="日付"></div>
+    </section>
+    <p class="hint">同じ印をもう一度タップすると外れるよ</p>
+
+    <section class="card todos" id="todos" aria-label="週間の用事">
+      <div class="nav">
+        <button class="icon-btn" id="week-prev" type="button" aria-label="前の週">‹</button>
+        <h2 id="week-title"></h2>
+        <button class="icon-btn" id="week-next" type="button" aria-label="次の週">›</button>
+      </div>
+      <div class="picks" id="picks" role="tablist" aria-label="曜日"></div>
+      <form id="composer" class="composer">
+        <label class="sr" for="task-input">用事</label>
+        <input id="task-input" maxlength="80" placeholder="用事を書く" autocomplete="off" enterkeyhint="done">
+        <button class="add-btn" type="submit">加える</button>
+      </form>
+      <p class="left" id="left" aria-live="polite"></p>
+      <ul id="task-list" class="tasks"></ul>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "pop-calendar-marks-v1";
+    const TASK_KEY = "retro-techo-tasks-v1";
+    const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+    const BATH_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3.5 12.5h17M6 12.5v4a6 6 0 0 0 12 0v-4M8 21.5v1.8M16 21.5v1.8M8 15.2q2-1.4 4 0t4 0M8.2 8.4c.7-.9.7-1.5 0-2.4M12 7.6c.7-.9.7-1.5 0-2.4M15.8 8.4c.7-.9.7-1.5 0-2.4"/></svg>`;
+
+    const title = document.getElementById("title");
+    const grid = document.getElementById("grid");
+    const countEl = document.getElementById("count");
+    const weekTitle = document.getElementById("week-title");
+    const picks = document.getElementById("picks");
+    const taskList = document.getElementById("task-list");
+    const taskInput = document.getElementById("task-input");
+    const leftEl = document.getElementById("left");
+
+    let cursor = startOfMonth(new Date());
+    let focusDate = startOfDay(new Date());
+    let marks = loadMarks();
+    let tasks = loadTasks();
+    let flashKey = null;
+
+    document.getElementById("prev").addEventListener("click", () => shiftMonth(-1));
+    document.getElementById("next").addEventListener("click", () => shiftMonth(1));
+    document.getElementById("today").addEventListener("click", () => showWeek(new Date()));
+    document.getElementById("week-prev").addEventListener("click", () => showWeek(addDays(focusDate, -7)));
+    document.getElementById("week-next").addEventListener("click", () => showWeek(addDays(focusDate, 7)));
+    document.getElementById("composer").addEventListener("submit", (event) => {
+      event.preventDefault();
+      addTask(taskInput.value);
+    });
+
+    watchSwipe(grid, (direction) => shiftMonth(direction));
+    watchSwipe(document.getElementById("todos"), (direction) => {
+      showWeek(addDays(focusDate, direction * 7));
+    });
+
+    render();
+    renderTasks();
+
+    function shiftMonth(amount) {
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth() + amount, 1);
+      render();
+    }
+
+    function render() {
+      const year = cursor.getFullYear();
+      const month = cursor.getMonth();
+      title.textContent = `${year}年 ${month + 1}月`;
+
+      const firstWeekday = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const todayKey = dateKey(new Date());
+      const focusKey = dateKey(focusDate);
+      const weekStart = startOfWeek(focusDate);
+      const weekEnd = addDays(weekStart, 7);
+      const openCounts = openCountByDate();
+      const fragment = document.createDocumentFragment();
+      let marked = 0;
+
+      for (let index = 0; index < firstWeekday; index += 1) {
+        fragment.append(document.createElement("span"));
+      }
+
+      for (let day = 1; day <= daysInMonth; day += 1) {
+        const date = new Date(year, month, day);
+        const key = dateKey(date);
+        const stamp = marks[key];
+        const open = openCounts.get(key) || 0;
+        if (stamp) marked += 1;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "day";
+        button.setAttribute("role", "gridcell");
+        const weekday = date.getDay();
+        if (weekday === 0) button.classList.add("sun");
+        if (weekday === 6) button.classList.add("sat");
+        if (date >= weekStart && date < weekEnd) button.classList.add("in-week");
+        if (key === todayKey) button.classList.add("today");
+        if (key === focusKey) button.classList.add("picked");
+        if (stamp) button.classList.add("marked");
+
+        const label = `${month + 1}月${day}日${stamp ? "、お風呂" : ""}${open ? `、用事${open}件` : ""}`;
+        button.setAttribute("aria-label", label);
+        button.setAttribute("aria-pressed", stamp ? "true" : "false");
+
+        const num = document.createElement("span");
+        num.className = "num";
+        num.textContent = String(day);
+        button.append(num);
+
+        if (open) {
+          const dot = document.createElement("span");
+          dot.className = "todo-dot";
+          dot.setAttribute("aria-hidden", "true");
+          button.append(dot);
+        }
+
+        if (stamp) {
+          const mark = document.createElement("span");
+          mark.className = key === flashKey ? "mark pop" : "mark";
+          mark.innerHTML = BATH_SVG;
+          button.append(mark);
+        }
+
+        button.addEventListener("click", () => toggle(key));
+        fragment.append(button);
+      }
+
+      grid.replaceChildren(fragment);
+      countEl.textContent = String(marked);
+    }
+
+    function renderTasks() {
+      const weekStart = startOfWeek(focusDate);
+      const focusKey = dateKey(focusDate);
+      weekTitle.textContent = formatWeek(weekStart);
+      taskInput.placeholder = `${WEEKDAYS[focusDate.getDay()]}曜の用事`;
+
+      const pickFragment = document.createDocumentFragment();
+      const openCounts = openCountByDate();
+      for (let offset = 0; offset < 7; offset += 1) {
+        const date = addDays(weekStart, offset);
+        const key = dateKey(date);
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "pick";
+        button.setAttribute("role", "tab");
+        button.setAttribute("aria-selected", String(key === focusKey));
+        if (offset === 0) button.classList.add("sun");
+        if (offset === 6) button.classList.add("sat");
+        const open = openCounts.get(key) || 0;
+        button.innerHTML = `<span class="w">${WEEKDAYS[offset]}</span><span class="n">${date.getDate()}</span><span class="open">${open ? open : ""}</span>`;
+        button.addEventListener("click", () => showWeek(date));
+        pickFragment.append(button);
+      }
+      picks.replaceChildren(pickFragment);
+
+      const dayTasks = tasks.filter((task) => task.date === focusKey);
+      const open = dayTasks.filter((task) => !task.done).length;
+      leftEl.textContent = dayTasks.length ? `未了 ${open}件` : "";
+
+      const list = document.createDocumentFragment();
+      if (!dayTasks.length) {
+        const empty = document.createElement("li");
+        empty.className = "empty";
+        empty.textContent = "この日の用事はない";
+        list.append(empty);
+      } else {
+        [...dayTasks.filter((task) => !task.done), ...dayTasks.filter((task) => task.done)].forEach((task) => {
+          list.append(taskItem(task));
+        });
+      }
+      taskList.replaceChildren(list);
+    }
+
+    function taskItem(task) {
+      const item = document.createElement("li");
+      item.className = task.done ? "task done" : "task";
+
+      const check = document.createElement("button");
+      check.type = "button";
+      check.className = "check";
+      check.setAttribute("aria-pressed", String(task.done));
+      check.setAttribute("aria-label", task.done ? "未了に戻す" : "完了にする");
+      check.textContent = task.done ? "✓" : "";
+      check.addEventListener("click", () => {
+        task.done = !task.done;
+        saveTasks();
+        render();
+        renderTasks();
+      });
+
+      const text = document.createElement("p");
+      text.className = "text";
+      text.textContent = task.text;
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "remove";
+      remove.setAttribute("aria-label", "削除");
+      remove.textContent = "×";
+      remove.addEventListener("click", () => {
+        tasks = tasks.filter((item) => item.id !== task.id);
+        saveTasks();
+        render();
+        renderTasks();
+      });
+
+      item.append(check, text, remove);
+      return item;
+    }
+
+    function addTask(raw) {
+      const text = raw.trim().slice(0, 80);
+      if (!text) return;
+      tasks.push({
+        id: crypto.randomUUID(),
+        date: dateKey(focusDate),
+        text,
+        done: false,
+      });
+      taskInput.value = "";
+      saveTasks();
+      render();
+      renderTasks();
+      taskInput.focus();
+    }
+
+    function showWeek(date) {
+      focusDate = startOfDay(date);
+      const monthStart = startOfMonth(focusDate);
+      if (monthStart.getTime() !== cursor.getTime()) cursor = monthStart;
+      render();
+      renderTasks();
+    }
+
+    function openCountByDate() {
+      const counts = new Map();
+      tasks.forEach((task) => {
+        if (task.done) return;
+        counts.set(task.date, (counts.get(task.date) || 0) + 1);
+      });
+      return counts;
+    }
+
+    function formatWeek(start) {
+      const end = addDays(start, 6);
+      const startLabel = `${start.getMonth() + 1}月${start.getDate()}日`;
+      const endLabel = start.getMonth() === end.getMonth()
+        ? `${end.getDate()}日`
+        : `${end.getMonth() + 1}月${end.getDate()}日`;
+      return `${startLabel} – ${endLabel}`;
+    }
+
+    function toggle(key) {
+      if (marks[key]) delete marks[key];
+      else marks[key] = "bath";
+      flashKey = key;
+      saveMarks();
+      render();
+      flashKey = null;
+    }
+
+    function startOfMonth(date) {
+      return new Date(date.getFullYear(), date.getMonth(), 1);
+    }
+
+    function startOfDay(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    function startOfWeek(date) {
+      const day = startOfDay(date);
+      return addDays(day, -day.getDay());
+    }
+
+    function addDays(date, amount) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate() + amount);
+    }
+
+    function watchSwipe(element, onSwipe) {
+      let start = null;
+      element.addEventListener("touchstart", (event) => {
+        if (event.target.closest("input, textarea")) return;
+        const touch = event.changedTouches[0];
+        start = { x: touch.clientX, y: touch.clientY };
+      }, { passive: true });
+      element.addEventListener("touchend", (event) => {
+        if (!start) return;
+        const touch = event.changedTouches[0];
+        const dx = touch.clientX - start.x;
+        const dy = touch.clientY - start.y;
+        start = null;
+        if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+        onSwipe(dx > 0 ? -1 : 1);
+      }, { passive: true });
+    }
+
+    function dateKey(date) {
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${date.getFullYear()}-${month}-${day}`;
+    }
+
+    function loadMarks() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+        const legacy = new Set(["star", "heart", "flower", "smile", "bath"]);
+        return Object.fromEntries(
+          Object.entries(parsed)
+            .filter(([, value]) => legacy.has(value))
+            .map(([key]) => [key, "bath"])
+        );
+      } catch {
+        return {};
+      }
+    }
+
+    function saveMarks() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(marks));
+      } catch {
+        /* 保存できなくても表示上の操作はそのまま続ける */
+      }
+    }
+
+    function loadTasks() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(TASK_KEY) || "[]");
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter((task) => (
+          task &&
+          typeof task.id === "string" &&
+          /^\d{4}-\d{2}-\d{2}$/.test(task.date) &&
+          typeof task.text === "string" &&
+          task.text.trim().length > 0 &&
+          task.text.length <= 80 &&
+          typeof task.done === "boolean"
+        ));
+      } catch {
+        return [];
+      }
+    }
+
+    function saveTasks() {
+      try {
+        localStorage.setItem(TASK_KEY, JSON.stringify(tasks));
+      } catch {
+        /* 保存できなくても表示上の操作はそのまま続ける */
+      }
+    }
+
+    const installHint = document.getElementById("install-hint");
+    const standalone = window.navigator.standalone === true
+      || window.matchMedia("(display-mode: standalone)").matches;
+    const phone = window.matchMedia("(pointer: coarse)").matches;
+    if (
+      phone
+      && !standalone
+      && "serviceWorker" in navigator
+      && localStorage.getItem("retro-techo-install-hint") !== "off"
+    ) {
+      installHint.hidden = false;
+    }
+    document.getElementById("install-dismiss").addEventListener("click", () => {
+      installHint.hidden = true;
+      try {
+        localStorage.setItem("retro-techo-install-hint", "off");
+      } catch {
+        /* 案内を閉じる操作だけは続ける */
+      }
+    });
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js");
+    }
+  </script>
+</body>
+</html>
